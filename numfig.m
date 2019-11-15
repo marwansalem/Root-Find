@@ -54,6 +54,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
+
 % End initialization code - DO NOT EDIT
 
 
@@ -91,6 +92,7 @@ function calculate_button_Callback(hObject, eventdata, handles)
 % hObject    handle to calculate_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.root_output,'string',''); % clear the text area
 
 func_str = get(handles.function_input,'string')
 
@@ -107,7 +109,9 @@ if fmethd ==1
     xm = bisection(f,1,2,eps,max_iter);
     xr =[xr xm];
 elseif fmethd ==2
-    y=1;
+    xm = false_position(f,1,2,eps,max_iter);
+    display('fp')
+    xr =[xr xm];
 elseif fmethd ==3
     y=2;
 elseif fmethd ==4
@@ -145,19 +149,19 @@ function load_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 load_mode = 1;
-[file,path] = uigetfile('*.*');
-full_path = strcat(path,file);
-file_id =fopen(full_path,'r');
-func_str = fgetl(file_id);
-max_iter = fgetl(file_id);
-eps = fgetl(file_id) 
-set(handles.function_input,'string',func_str);
-set(handles.max_iter_text,'string',max_iter);
-set(handles.epsilon_text,'string',eps);
-eps = str2double(eps);
-max_iter = str2double(max_iter);
-
-
+[file,path] = uigetfile('*.*');  % returns [0,0] if open is cancelled
+if file ~= 0 and path~= 2   
+    full_path = strcat(path,file);
+    file_id =fopen(full_path,'r');
+    func_str = fgetl(file_id);
+    max_iter = fgetl(file_id);
+    eps = fgetl(file_id) 
+    set(handles.function_input,'string',func_str);
+    set(handles.max_iter_text,'string',max_iter);
+    set(handles.epsilon_text,'string',eps);
+    eps = str2double(eps);
+    max_iter = str2double(max_iter);
+end
 
 function epsilon_text_Callback(hObject, eventdata, handles)
 % hObject    handle to epsilon_text (see GCBO)
