@@ -36,7 +36,7 @@ gui_State = struct('gui_Name',       mfilename, ...
                
 clc   
 syms x;
-f(x) = x;
+f = inline('x');
 load_mode = 0;
 func_str = '';
 eps = 0.00001;
@@ -91,27 +91,21 @@ function calculate_button_Callback(hObject, eventdata, handles)
 % hObject    handle to calculate_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-syms x;
+
 func_str = get(handles.function_input,'string')
-class(func_str)
+
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
-f(x) = sym(char(func_str));
-g = f(x);
-class(g);
-display('here')
-f(x)
-yy=f(3)
-yy = sym2poly(yy);% convert from symbol to coeffcient form,,, only one ,however just one coefficient
+f = inline(func_str);
+xr= [];
+%yy = sym2poly(yy);% convert from symbol to coeffcient form,,, only one ,however just one coefficient
 
-display('here2')
-class(yy)
 
-yy = num2str(yy);
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
-set(handles.root_output,'string',num2str(yy));
+
 if fmethd ==1
-    y=0;
+    xm = bisection(f,1,2,eps,max_iter);
+    xr =[xr xm];
 elseif fmethd ==2
     y=1;
 elseif fmethd ==3
@@ -121,6 +115,7 @@ elseif fmethd ==4
 elseif fmethd ==5
     y=4;
 end 
+set(handles.root_output,'string',mat2str(xr));
 
 function function_input_Callback(hObject, eventdata, handles)
 % hObject    handle to function_input (see GCBO)
