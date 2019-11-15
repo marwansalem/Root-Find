@@ -1,3 +1,4 @@
+
 function varargout = numfig(varargin)
 % NUMFIG MATLAB code for numfig.fig
 %      NUMFIG, by itself, creates a new NUMFIG or raises the existing
@@ -33,7 +34,7 @@ gui_State = struct('gui_Name',       mfilename, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
                
-               
+clc   
 syms x;
 f(x) = x;
 load_mode = 0;
@@ -90,13 +91,25 @@ function calculate_button_Callback(hObject, eventdata, handles)
 % hObject    handle to calculate_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-func_str = get(handles.function_input,'string');
+syms x;
+func_str = get(handles.function_input,'string')
+class(func_str)
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
-f(x) = sym(func_str);
+f(x) = sym(char(func_str));
+g = f(x);
+class(g);
 display('here')
+f(x)
+yy=f(3)
+yy = sym2poly(yy);% convert from symbol to coeffcient form,,, only one ,however just one coefficient
+
+display('here2')
+class(yy)
+
+yy = num2str(yy);
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
-set(handles.root_output,'string',f(3));
+set(handles.root_output,'string',num2str(yy));
 if fmethd ==1
     y=0;
 elseif fmethd ==2
