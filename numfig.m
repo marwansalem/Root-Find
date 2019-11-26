@@ -98,6 +98,10 @@ func_str = get(handles.function_input,'string')
 
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
+
+func_str = strrep(func_str,'e','2.7182818'); 
+% replace e with its numeric value  because matlab cannot compute 
+% because matlab cannot compute e^3 it computes exp(3)
 f = inline(func_str);
 xr= [];
 %yy = sym2poly(yy);% convert from symbol to coeffcient form,,, only one ,however just one coefficient
@@ -112,12 +116,16 @@ elseif fmethd ==2
     xm = false_position(f,1,2,eps,max_iter);
     display('fp')
     xr =[xr xm];
-elseif fmethd ==3
+elseif fmethd ==3;
     y=2;
-elseif fmethd ==4
-    y=3;
-elseif fmethd ==5
-    y=4;
+elseif fmethd ==4;
+    x_0 = -10
+    xm = newton_raphson(func_str,x_0, eps, max_iter);
+    xr = [xr xm];
+elseif fmethd ==5;
+    display('Yeah')
+    xm = Secant(f,0,1,eps,max_iter);
+    xr = [xr xm];
 end 
 set(handles.root_output,'string',mat2str(xr));
 
