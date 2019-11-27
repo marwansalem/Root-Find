@@ -1,9 +1,11 @@
-function xr = newton_raphson(func_str,x_0,eps,max_iter)
+function [xr,table_results] = newton_raphson(func_str,x_0,eps,max_iter)
 syms x;
 f = inline(func_str);
 g(x) = diff(sym('func_str')); %  g(x) = diff is not correct
 %
 xi = x_0;
+xr = xi;
+table_results = [];
 %% p
 for i = 1:1: max_iter
     
@@ -14,7 +16,8 @@ for i = 1:1: max_iter
         break;
     end
     ea = abs((xr-xi)/xr)
-    if ea < eps
+    table_results = [table_results; xi ea];
+    if ea < eps;
         break;
     end
     xi = xr;
