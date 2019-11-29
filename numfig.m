@@ -127,7 +127,7 @@ elseif fmethd ==2;   % false position
     xu = bounds(2);
     xl = str2num(char(xl));   % convert to number
     xu = str2num(char(xu));
-    [xm , table_results] = false_position(f,-10,10,eps,max_iter);
+    [xm , table_results] = false_position(f,xu,xl,eps,max_iter);
     xr =[xr xm];
     set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
     
