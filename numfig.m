@@ -110,29 +110,48 @@ table_results = [];
 
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
 
-if fmethd ==1
-    [xm , table_results] = bisection(f,-10,10,eps,max_iter);
+if fmethd ==1;  % bisection
+    bounds = inputdlg({'Enter lower bound','enter upper bound'});
+    xl = bounds(1);  %type will be cell
+    xu = bounds(2);
+    xl = str2num(char(xl));
+    xu = str2num(char(xu));
+
+    [xm , table_results] = bisection(f,xl,xu,eps,max_iter);
     xr =[xr xm];
     set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
     
-elseif fmethd ==2
+elseif fmethd ==2;   % false position
+    bounds = inputdlg({'Enter lower bound','enter upper bound'});
+    xl = bounds(1);  %type will be cell
+    xu = bounds(2);
+    xl = str2num(char(xl));   % convert to number
+    xu = str2num(char(xu));
     [xm , table_results] = false_position(f,-10,10,eps,max_iter);
     xr =[xr xm];
     set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
     
-elseif fmethd ==3;
+elseif fmethd ==3;    % fixed point
     gx_str = char(inputdlg('Enter g(x)'));
     g = inline(gx_str);
     
-elseif fmethd ==4;
+elseif fmethd ==4;  % newton raphson
     x_0 = -10;
+    x_0 = inputdlg({'Enter Initial guess'});
+    x_0 = str2num(char( x_0)) ;
+
     [xm, table_results] = newton_raphson(func_str,x_0, eps, max_iter);
     xr = [xr xm];
     set(handles.table, 'columnname',{'xi', 'ea'});
     
-elseif fmethd ==5;
-    display('Yeah')
-    [xm, table_results] = Secant(f,0,1,eps,max_iter);
+elseif fmethd ==5;   % secant
+    bounds = inputdlg({'Enter first guess','Enter second guess'});
+    x_0 = bounds(1);  %type will be cell
+    x_1 = bounds(2);
+    x_0 = str2num(char(x_0));
+    x_1 = str2num(char(x_1));
+
+    [xm, table_results] = Secant(f,x_0,x_1,eps,max_iter);
     xr = [xr xm];
     set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});
 end 
