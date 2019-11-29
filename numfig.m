@@ -23,7 +23,7 @@ function varargout = numfig(varargin)
 
 % Edit the above text to modify the response to help numfig
 
-% Last Modified by GUIDE v2.5 15-Nov-2019 16:17:04
+% Last Modified by GUIDE v2.5 27-Nov-2019 23:33:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,27 +98,69 @@ func_str = get(handles.function_input,'string')
 
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
+
+func_str = strrep(func_str,'e','2.7182818'); 
+% replace e with its numeric value  because matlab cannot compute 
+% because matlab cannot compute e^3 it computes exp(3)
 f = inline(func_str);
 xr= [];
 %yy = sym2poly(yy);% convert from symbol to coeffcient form,,, only one ,however just one coefficient
 
+table_results = [];
 
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
 
-if fmethd ==1
-    xm = bisection(f,1,2,eps,max_iter);
+if fmethd ==1;  % bisection
+    bounds = inputdlg({'Enter lower bound','enter upper bound'});
+    xl = bounds(1);  %type will be cell
+    xu = bounds(2);
+    xl = str2num(char(xl));
+    xu = str2num(char(xu));
+
+    [xm , table_results] = bisection(f,xl,xu,eps,max_iter);
     xr =[xr xm];
-elseif fmethd ==2
-    xm = false_position(f,1,2,eps,max_iter);
-    display('fp')
+    set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+    
+elseif fmethd ==2;   % false position
+    bounds = inputdlg({'Enter lower bound','enter upper bound'});
+    xl = bounds(1);  %type will be cell
+    xu = bounds(2);
+    xl = str2num(char(xl));   % convert to number
+    xu = str2num(char(xu));
+    [xm , table_results] = false_position(f,xu,xl,eps,max_iter);
     xr =[xr xm];
-elseif fmethd ==3
-    y=2;
-elseif fmethd ==4
-    y=3;
-elseif fmethd ==5
-    y=4;
+    set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+    
+elseif fmethd ==3;    % fixed point
+    gx_str = char(inputdlg('Enter g(x)'));
+    g = inline(gx_str);
+    
+elseif fmethd ==4;  % newton raphson
+    x_0 = -10;
+    x_0 = inputdlg({'Enter Initial guess'});
+    x_0 = str2num(char( x_0)) ;
+
+    [xm, table_results] = newton_raphson(func_str,x_0, eps, max_iter);
+    xr = [xr xm];
+    set(handles.table, 'columnname',{'xi', 'ea'});
+    
+elseif fmethd ==5;   % secant
+    bounds = inputdlg({'Enter first guess','Enter second guess'});
+    x_0 = bounds(1);  %type will be cell
+    x_1 = bounds(2);
+    x_0 = str2num(char(x_0));
+    x_1 = str2num(char(x_1));
+
+    [xm, table_results] = Secant(f,x_0,x_1,eps,max_iter);
+    xr = [xr xm];
+    set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});
 end 
+axes(handles.axes2);
+t_lin = linspace(-10,10,100);
+
+plot(t_lin,f(t_lin), xr*ones(1,30),linspace(-3,3,30));
+grid on ;
+set(handles.table,'data',table_results);
 set(handles.root_output,'string',mat2str(xr));
 
 function function_input_Callback(hObject, eventdata, handles)
@@ -227,3 +269,19 @@ function root_output_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes during object creation, after setting all properties.
+function axes2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axes2
+
+
+% --- Executes during object creation, after setting all properties.
+function table_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to table (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
