@@ -1,5 +1,5 @@
 % Secant Method in MATLAB
-function [xr, table_results] = Secant(f,x_0,x_1,eps,max_iter)
+function [x, i, table_results] = Secant(f,x_0,x_1,eps,max_iter)
  
 x(1)=x_0;
 x(2)=x_1;
@@ -21,6 +21,10 @@ for i=3:max_iter
         xr = x(i-1);% previous errors
     end
     ea= abs((x(i)-x(i-1))/x(i));
+    if x(i) == 0 && x(i-1) == 0
+        table_results = [table_results; x(i-2) x(i-1) f(x(i-2)) f(x(i-1)) x(i) 0];
+        return
+    end
     table_results = [table_results; x(i-2) x(i-1) f(x(i-2)) f(x(i-1)) x(i) ea];
     fprintf('%f \t %f \n',x(i),ea);
     if abs((x(i)-x(i-1))/x(i))<eps;

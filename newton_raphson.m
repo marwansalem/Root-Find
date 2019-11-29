@@ -16,6 +16,10 @@ for i = 1:1: max_iter
         break;
     end
     ea = abs((xr-xi)/xr)
+    if xr == 0 && xi ==0 
+        table_results = [table_results; xi 0];
+        return;
+    end
     table_results = [table_results; xi ea];
     if ea < eps;
         break;

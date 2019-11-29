@@ -2,15 +2,19 @@
 %%Basem Gaber
 %% ID: 4826
 
-function [xr ,table_results ] = false_position(f,xl,xu,eps,max_iter)
+function [xrList, i ,table_results ] = false_position(f,xl,xu,eps,max_iter)
 % a=input('Enter function with right hand side zero:','s');
 % f=inline(a);
 % xl=input('Enter the first value of guess interval:') ;
 % xu=input('Enter the end value of guess interval:');
 % es=input('Enter the allowed error:');
 % imax=input('Enter the max allowed iterations:');
-if (f(xl) * f(xu) > 0);  % if guesses do not bracket, exit
+
+
+xr = intmax;
+if (f(xl) * f(xu) > 0) % if guesses do not bracket, exit
     disp('no bracket')
+    table_results = -1;
     return
 end
 

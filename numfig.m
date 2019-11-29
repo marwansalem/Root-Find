@@ -116,10 +116,15 @@ if fmethd ==1;  % bisection
     xu = bounds(2);
     xl = str2num(char(xl));
     xu = str2num(char(xu));
-
-    [xm , table_results] = bisection(f,xl,xu,eps,max_iter);
-    xr =[xr xm];
-    set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+    tic
+    [xmList , iNum , table_results] = bisection(f,xl,xu,eps,max_iter);
+    timeElapsed = toc;
+    if table_results == -1
+        set(handles.root_output,'string','Error: No Bracket!!' );
+        set(handles.table,'data','error');
+    end
+        xr =[xr xmList(iNum)];
+        set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
     
 elseif fmethd ==2;   % false position
     bounds = inputdlg({'Enter lower bound','enter upper bound'});
@@ -127,20 +132,36 @@ elseif fmethd ==2;   % false position
     xu = bounds(2);
     xl = str2num(char(xl));   % convert to number
     xu = str2num(char(xu));
-    [xm , table_results] = false_position(f,xu,xl,eps,max_iter);
-    xr =[xr xm];
-    set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
-    
+    tic
+    [xmList , iNum , table_results] = false_position(f,xu,xl,eps,max_iter);
+        timeElapsed = toc;
+
+    if table_results == -1
+        set(handles.root_output,'string','Error: No Bracket!!' ); 
+        set(handles.table,'data','error');
+    end
+        xr =[xr xmList(iNum)];
+        set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+        
 elseif fmethd ==3;    % fixed point
     gx_str = char(inputdlg('Enter g(x)'));
     g = inline(gx_str);
-    
+    x_0 = inputdlg({'Enter Initial guess'});
+    x = str2num(char( x_0)) ;
+    %y=feval(g,x);
+    %disp(y);
+    tic
+    [xr , table_results] = fixed_point(g,x,eps,max_iter);
+    timeElapsed = toc;
+    xr = [xr xm];
+    set(handles.table, 'columnname',{'xi', 'ea'});
 elseif fmethd ==4;  % newton raphson
     x_0 = -10;
     x_0 = inputdlg({'Enter Initial guess'});
     x_0 = str2num(char( x_0)) ;
-
+    tic
     [xm, table_results] = newton_raphson(func_str,x_0, eps, max_iter);
+    timeElapsed = toc;
     xr = [xr xm];
     set(handles.table, 'columnname',{'xi', 'ea'});
     
@@ -150,16 +171,34 @@ elseif fmethd ==5;   % secant
     x_1 = bounds(2);
     x_0 = str2num(char(x_0));
     x_1 = str2num(char(x_1));
-
-    [xm, table_results] = Secant(f,x_0,x_1,eps,max_iter);
-    xr = [xr xm];
+    tic
+    [xmList, iNum , table_results] = Secant(f,x_0,x_1,eps,max_iter);
+    timeElapsed = toc;
+    xr = [xr xmList(iNum)];
     set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});
 end 
 axes(handles.axes2);
-t_lin = linspace(-10,10,100);
 
-plot(t_lin,f(t_lin), xr*ones(1,30),linspace(-3,3,30));
-grid on ;
+if fmethd == 1 || fmethd == 2
+    t_lin = linspace(xl,xu,100);
+else
+    t_lin = linspace(-10,10,100);
+end
+
+if fmethd == 1 || fmethd == 2 || fmethd==5
+    hold off;
+    for k = 1 : iNum
+        plot(t_lin,f(t_lin), xmList(k)*ones(1,30),linspace(-3,3,30));
+        hold on;
+    end
+    grid on ;
+    axis on;
+else
+    hold off;
+    plot(t_lin,f(t_lin), xr*ones(1,30),linspace(-3,3,30));
+    grid on ;
+    axis on;
+end
 set(handles.table,'data',table_results);
 set(handles.root_output,'string',mat2str(xr));
 
