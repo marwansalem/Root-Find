@@ -147,6 +147,7 @@ elseif fmethd ==2;   % false position
         
 elseif fmethd ==3;    % fixed point
     gx_str = char(inputdlg('Enter g(x)'));
+    gx_str = strrep(gx_str,'e','2.7182818');
     g = inline(gx_str);
     x_0 = inputdlg({'Enter Initial guess'});
     x = str2num(char( x_0)) ;
@@ -180,13 +181,13 @@ elseif fmethd ==5;   % secant
 end 
 axes(handles.axes2);
 
-if fmethd == 1 || fmethd == 2
+if fmethd == 1 || fmethd == 2;
     t_lin = linspace(xl,xu,100);
 else
     t_lin = linspace(-10,10,100);
 end
 
-if fmethd == 1 || fmethd == 2 || fmethd==5
+if fmethd == 1 || fmethd == 2 || fmethd==5;
     hold off;
     for k = 1 : iNum
         plot(t_lin,f(t_lin), xmList(k)*ones(1,30),linspace(-3,3,30));
