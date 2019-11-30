@@ -124,7 +124,9 @@ if fmethd ==1;  % bisection
     timeElapsed = toc;
     if table_results == -1
         set(handles.root_output,'string','Error: No Bracket!!' );
-        %set(handles.table,'data','error');
+        answer = questdlg('Error: No Bracket!!', ...
+	'Error', ...
+	'OK','Ok');
         drawBool = false;
     else
         xr =[xr xmList(iNum)];
@@ -143,10 +145,14 @@ elseif fmethd ==2;   % false position
 
     if table_results == -1
         set(handles.root_output,'string','Error: No Bracket!!' ); 
-        %set(handles.table,'data','error');
-    end
+        answer = questdlg('Error: No Bracket!!', ...
+	'Error', ...
+	'OK','Ok');
+        drawBool = false;
+    else
         xr =[xr xmList(iNum)];
         set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+    end
         
 elseif fmethd ==3;    % fixed point
     gx_str = char(inputdlg('Enter g(x)'));
@@ -179,8 +185,16 @@ elseif fmethd ==5;   % secant
     tic
     [xmList, iNum , table_results] = Secant(f, x_0, x_1, eps, max_iter, mode);
     timeElapsed = toc;
+    if table_results == -1
+        set(handles.root_output,'string','Error: Secant guesses can''t be equal!!' ); 
+        answer = questdlg('Error: Secant guesses can''t be equal!!', ...
+	'Error', ...
+	'OK','Ok');
+        drawBool = false;
+    else
     xr = [xr xmList(iNum)];
-    set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});
+    set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});  
+    end
 end 
 axes(handles.axes2);
 

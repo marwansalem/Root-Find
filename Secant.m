@@ -1,6 +1,13 @@
 % Secant Method in MATLAB
 function [x, i, table_results] = Secant(f,x_0,x_1,eps,max_iter,single_step)
  
+if x_0 == x_1 
+    disp('secant guesses must be different')
+    table_results = -1;
+    x = [];
+    i = 1;
+    return
+end
 x(1)=x_0;
 x(2)=x_1;
 
