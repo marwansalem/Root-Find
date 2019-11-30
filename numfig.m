@@ -112,6 +112,7 @@ table_results = [];
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
 
 timeElapsed = intmin;
+drawBool = true;
 if fmethd ==1;  % bisection
     bounds = inputdlg({'Enter lower bound','enter upper bound'});
     xl = bounds(1);  %type will be cell
@@ -123,10 +124,12 @@ if fmethd ==1;  % bisection
     timeElapsed = toc;
     if table_results == -1
         set(handles.root_output,'string','Error: No Bracket!!' );
-        set(handles.table,'data','error');
-    end
+        %set(handles.table,'data','error');
+        drawBool = false;
+    else
         xr =[xr xmList(iNum)];
         set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
+    end
     
 elseif fmethd ==2;   % false position
     bounds = inputdlg({'Enter lower bound','enter upper bound'});
@@ -140,7 +143,7 @@ elseif fmethd ==2;   % false position
 
     if table_results == -1
         set(handles.root_output,'string','Error: No Bracket!!' ); 
-        set(handles.table,'data','error');
+        %set(handles.table,'data','error');
     end
         xr =[xr xmList(iNum)];
         set(handles.table, 'columnname',{'xl', 'xu', 'xr', 'ea', 'f(xr)'});
@@ -186,24 +189,29 @@ if fmethd == 1 || fmethd == 2;
 else
     t_lin = linspace(-10,10,100);
 end
-
-if fmethd == 1 || fmethd == 2 || fmethd==5;
-    hold off;
-    for k = 1 : iNum
-        plot(t_lin,f(t_lin), xmList(k)*ones(1,30),linspace(-3,3,30));
-        hold on;
+if drawBool ~= false
+    if fmethd == 1 || fmethd == 2 || fmethd==5;
+        hold off;
+        for k = 1 : iNum
+            plot(t_lin,f(t_lin), xmList(k)*ones(1,30),linspace(-3,3,30));
+            hold on;
+        end
+        grid on ;
+        axis on;
+    else
+        hold off;
+        plot(t_lin,f(t_lin), xr*ones(1,30),linspace(-3,3,30));
+        grid on ;
+        axis on;
     end
-    grid on ;
-    axis on;
-else
-    hold off;
-    plot(t_lin,f(t_lin), xr*ones(1,30),linspace(-3,3,30));
-    grid on ;
-    axis on;
 end
 set(handles.table,'data',table_results);
 set(handles.time_elapsed_field,'string',num2str(timeElapsed));
-set(handles.root_output,'string',mat2str(xr));
+if drawBool ~= false
+    set(handles.root_output,'string',mat2str(xr));
+else
+    drawBool = true;
+end
 
 function function_input_Callback(hObject, eventdata, handles)
 % hObject    handle to function_input (see GCBO)

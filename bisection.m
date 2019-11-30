@@ -1,6 +1,4 @@
 % Bisection Method
-%%Basem Gaber
-%% ID: 4826
 function [xrList,i,table_results] = bisection(f,xl,xu,eps,max_iter,single_step)
 
 
@@ -8,6 +6,8 @@ xr = intmax;
 if (f(xl) * f(xu) > 0) % if guesses do not bracket, exit
     disp('no bracket')
     table_results = -1;
+    xrList = [];
+    i = 1;
     return
 end
 
