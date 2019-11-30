@@ -23,7 +23,7 @@ function varargout = numfig(varargin)
 
 % Edit the above text to modify the response to help numfig
 
-% Last Modified by GUIDE v2.5 27-Nov-2019 23:33:35
+% Last Modified by GUIDE v2.5 29-Nov-2019 17:11:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -94,7 +94,8 @@ function calculate_button_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set(handles.root_output,'string',''); % clear the text area
 
-func_str = get(handles.function_input,'string')
+mode = get(handles.mode_checkbox,'value');% get mode from checkbox
+func_str = get(handles.function_input,'string');
 
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
@@ -110,6 +111,7 @@ table_results = [];
 
 fmethd = get(handles.bisect_button,'value')+2*get(handles.false_button,'value') +3*get(handles.fixed_button,'value') +4*get(handles.newton_button,'value')+5*get(handles.secant_button,'value');
 
+timeElapsed = intmin;
 if fmethd ==1;  % bisection
     bounds = inputdlg({'Enter lower bound','enter upper bound'});
     xl = bounds(1);  %type will be cell
@@ -117,7 +119,7 @@ if fmethd ==1;  % bisection
     xl = str2num(char(xl));
     xu = str2num(char(xu));
     tic
-    [xmList , iNum , table_results] = bisection(f,xl,xu,eps,max_iter);
+    [xmList , iNum , table_results] = bisection(f,xl,xu,eps,max_iter,mode);
     timeElapsed = toc;
     if table_results == -1
         set(handles.root_output,'string','Error: No Bracket!!' );
@@ -133,7 +135,7 @@ elseif fmethd ==2;   % false position
     xl = str2num(char(xl));   % convert to number
     xu = str2num(char(xu));
     tic
-    [xmList , iNum , table_results] = false_position(f,xu,xl,eps,max_iter);
+    [xmList , iNum , table_results] = false_position(f,xu,xl,eps,max_iter,mode);
         timeElapsed = toc;
 
     if table_results == -1
@@ -145,22 +147,22 @@ elseif fmethd ==2;   % false position
         
 elseif fmethd ==3;    % fixed point
     gx_str = char(inputdlg('Enter g(x)'));
+    gx_str = strrep(gx_str,'e','2.7182818');
     g = inline(gx_str);
     x_0 = inputdlg({'Enter Initial guess'});
     x = str2num(char( x_0)) ;
     %y=feval(g,x);
     %disp(y);
     tic
-    [xr , table_results] = fixed_point(g,x,eps,max_iter);
+    [xr , table_results] = fixed_point(g, x, eps, max_iter, mode);
     timeElapsed = toc;
-    xr = [xr xm];
     set(handles.table, 'columnname',{'xi', 'ea'});
 elseif fmethd ==4;  % newton raphson
     x_0 = -10;
     x_0 = inputdlg({'Enter Initial guess'});
     x_0 = str2num(char( x_0)) ;
     tic
-    [xm, table_results] = newton_raphson(func_str,x_0, eps, max_iter);
+    [xm, table_results] = newton_raphson(func_str, x_0, eps, max_iter, mode);
     timeElapsed = toc;
     xr = [xr xm];
     set(handles.table, 'columnname',{'xi', 'ea'});
@@ -172,20 +174,20 @@ elseif fmethd ==5;   % secant
     x_0 = str2num(char(x_0));
     x_1 = str2num(char(x_1));
     tic
-    [xmList, iNum , table_results] = Secant(f,x_0,x_1,eps,max_iter);
+    [xmList, iNum , table_results] = Secant(f, x_0, x_1, eps, max_iter, mode);
     timeElapsed = toc;
     xr = [xr xmList(iNum)];
     set(handles.table, 'columnname',{'xi-1', 'xi', 'f(xi-1)', 'f(xi)', 'xi+1', 'ea'});
 end 
 axes(handles.axes2);
 
-if fmethd == 1 || fmethd == 2
+if fmethd == 1 || fmethd == 2;
     t_lin = linspace(xl,xu,100);
 else
     t_lin = linspace(-10,10,100);
 end
 
-if fmethd == 1 || fmethd == 2 || fmethd==5
+if fmethd == 1 || fmethd == 2 || fmethd==5;
     hold off;
     for k = 1 : iNum
         plot(t_lin,f(t_lin), xmList(k)*ones(1,30),linspace(-3,3,30));
@@ -200,6 +202,7 @@ else
     axis on;
 end
 set(handles.table,'data',table_results);
+set(handles.time_elapsed_field,'string',num2str(timeElapsed));
 set(handles.root_output,'string',mat2str(xr));
 
 function function_input_Callback(hObject, eventdata, handles)
@@ -324,3 +327,12 @@ function table_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to table (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on button press in mode_checkbox.
+function mode_checkbox_Callback(hObject, eventdata, handles)
+% hObject    handle to mode_checkbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of mode_checkbox
