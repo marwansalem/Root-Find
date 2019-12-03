@@ -100,7 +100,7 @@ func_str = get(handles.function_input,'string');
 eps = str2double(get(handles.epsilon_text,'string'));
 max_iter = str2double(get(handles.max_iter_text,'string'));
 
-func_str = strrep(func_str,'e','2.7182818'); 
+%func_str = strrep(func_str,'e','2.7182818'); 
 % replace e with its numeric value  because matlab cannot compute 
 % because matlab cannot compute e^3 it computes exp(3)
 f = inline(func_str);
@@ -170,6 +170,15 @@ elseif fmethd ==4;  % newton raphson
     x_0 = -10;
     x_0 = inputdlg({'Enter Initial guess'});
     x_0 = str2num(char( x_0)) ;
+    fff = inline(func_str);
+    error_flag = 0;
+    syms x;
+    
+    [n(x),d(x)] = numden(sym(func_str));
+    if d(x_0) == 0;
+        fprintf('Wrong input division by zero');
+        return
+    end
     tic
     [xm, table_results] = newton_raphson(func_str, x_0, eps, max_iter, mode);
     timeElapsed = toc;
@@ -182,6 +191,12 @@ elseif fmethd ==5;   % secant
     x_1 = bounds(2);
     x_0 = str2num(char(x_0));
     x_1 = str2num(char(x_1));
+    syms x;
+    [n(x),d(x)] = numden(sym(func_str));
+    if d(x_0) == 0 ||   d(x_1)==0;
+        fprintf('Wrong input division by zero');
+        return
+    end
     tic
     [xmList, iNum , table_results] = Secant(f, x_0, x_1, eps, max_iter, mode);
     timeElapsed = toc;
